@@ -135,13 +135,14 @@ function stateChart() {
         });         
 }
 function countyChart() {
-//const data = d3.csv('https://raw.githubusercontent.com/SathishRama/srama.github.io/master/us-states.csv')
+
         var marginx = 50;
         var marginy = 100;
-        //const data = d3.csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv')
-        //const data = d3.csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
         
-        const data3 = d3.csv('test_counties.csv')
+        //const data = d3.csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
+        const data = d3.csv('https://raw.githubusercontent.com/SathishRama/srama.github.io/master/us-counties.csv')
+        //const data3 = d3.csv('test_counties.csv')
+        
         var default_state = 'Alabama'
         
         .then(function(data){            

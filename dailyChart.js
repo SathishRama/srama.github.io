@@ -1,4 +1,6 @@
+
 //const data2 = d3.csv('https://raw.githubusercontent.com/SathishRama/srama.github.io/master/test_covid.csv')
+function dailyChart() {
        const data2 = d3.csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv')
         .then(function(data2){
               
@@ -73,3 +75,4 @@
         .catch(function() {
               console.log(Error)
         });
+}

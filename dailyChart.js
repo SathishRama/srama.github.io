@@ -76,3 +76,124 @@ function dailyChart() {
               console.log(Error)
         });
 }
+
+function stateChart() {
+//const data = d3.csv('https://raw.githubusercontent.com/SathishRama/srama.github.io/master/us-states.csv')
+        var marginx = 50;
+        var marginy = 100;
+        const data2 = d3.csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv')
+        .then(function(data){            
+              var statecounts = d3.nest()
+                  .key(function(d) {return d.state }).sortKeys(d3.ascending)
+                  .rollup(function(v) { return d3.max( v, function(d) { return parseInt(d.cases)})})
+                  .entries(data);           
+              var statelist = [] ;
+              var statecases = [] ;
+              var k = 0 ;
+              
+              statecounts.forEach( function(each) {
+                statelist[k] = each.key ;
+                statecases[k] = each.value ;
+                k++ ;
+                //console.log(each.key , each.value);
+              });                          
+              
+              colorScale = d3.scaleLinear().domain([0,d3.max(statecases)]).range(["lightblue","red"]);             
+              xs = d3.scaleBand().domain(statelist).range([0,1300]);
+              ys = d3.scaleLinear().domain([0,d3.max(statecases)]).range([200,0]);
+
+              d3.select(".myDivStateChart").select("svg").append("g")
+                .attr("transform","translate(50,50)")
+                .call(d3.axisLeft(ys));
+              d3.select(".myDivStateChart").select("svg").append("g")
+                .attr("transform","translate(50,250)")
+                .call(d3.axisBottom(xs))
+                .selectAll("text") 
+                  .style("text-anchor", "end")
+                  .attr("dx", "-.8em")
+                  .attr("dy", ".15em")
+                  .attr("transform", "rotate(-65)");
+
+              d3.select(".myDivStateChart").select("svg")
+                .append('g').attr("transform","translate(50,50)")
+                .selectAll('rect')
+                //.append("path")
+                .data(statecounts)
+                .enter()
+                .append('rect')
+                  .attr('x',function(d,i) {return xs(d.key)})
+                  .attr('y',function(d,i) {return ys(d.value)})
+                  //.attr('y',function(d,i) {return (100)})
+                  .attr('width',xs.bandwidth())
+                  .attr('height',function(d) {return (200 - ys(d.value))})
+                  .attr('fill', function(d) {return (colorScale(d.value))})
+                  .attr('stroke','black');
+
+        })
+        .catch(function() {
+              console.log(Error)
+        });         
+}
+function countyChart() {
+//const data = d3.csv('https://raw.githubusercontent.com/SathishRama/srama.github.io/master/us-states.csv')
+        var marginx = 50;
+        var marginy = 100;
+        //const data = d3.csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv')
+        //const data = d3.csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
+        
+        const data3 = d3.csv('test_counties.csv')
+        var default_state = 'Alabama'
+        
+        .then(function(data){            
+              var countycounts = d3.nest()
+                  .filter(function(d) {return d.state == default_state})
+                  .key(function(d) {return d.county }).sortKeys(d3.ascending)
+                  .rollup(function(v) { return d3.max( v, function(d) { return parseInt(d.cases)})})
+                  .entries(data3);           
+              var countylist = [] ;
+              var countycases = [] ;
+              var k = 0 ;
+              
+              statecounts.forEach( function(each) {
+                countyist[k] = each.key ;
+                countycases[k] = each.value ;
+                k++ ;
+                //console.log(each.key , each.value);
+              });                          
+              
+              colorScale = d3.scaleLinear().domain([0,d3.max(countycases)]).range(["lightblue","red"]);             
+              xs = d3.scaleBand().domain(countylist).range([0,1300]);
+              ys = d3.scaleLinear().domain([0,d3.max(countycases)]).range([200,0]);
+
+              d3.select(".myDivStateChart").select("svg").append("g")
+                .attr("transform","translate(50,50)")
+                .call(d3.axisLeft(ys));
+              d3.select(".myDivStateChart").select("svg").append("g")
+                .attr("transform","translate(50,250)")
+                .call(d3.axisBottom(xs))
+                .selectAll("text") 
+                  .style("text-anchor", "end")
+                  .attr("dx", "-.8em")
+                  .attr("dy", ".15em")
+                  .attr("transform", "rotate(-65)");
+
+              d3.select(".myDivStateChart").select("svg")
+                .append('g').attr("transform","translate(50,50)")
+                .selectAll('rect')
+                //.append("path")
+                .data(countycounts)
+                .enter()
+                .append('rect')
+                  .attr('x',function(d,i) {return xs(d.key)})
+                  .attr('y',function(d,i) {return ys(d.value)})
+                  //.attr('y',function(d,i) {return (100)})
+                  .attr('width',xs.bandwidth())
+                  .attr('height',function(d) {return (200 - ys(d.value))})
+                  .attr('fill', function(d) {return (colorScale(d.value))})
+                  .attr('stroke','black');
+
+        })
+        .catch(function() {
+              console.log(Error)
+        });         
+}

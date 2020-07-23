@@ -13,9 +13,24 @@ const data = d3.csv('https://raw.githubusercontent.com/nytimes/covid-19-data/mas
             newState[i] = document.createElement('option');
             newState[i].innerHTML = statenames[i].key;  
             document.getElementById("state").add(newState[i]);
-            console.log("Added state : " ,  statenames[i].key)
+            //console.log("Added state : " ,  statenames[i].key)
           }                                        
     })
     .catch(function() {
         console.log(Error)
     })         
+//Register chang event
+const selectElement = document.querySelector("#state");
+selectElement.addEventListener('change', (event) => {
+  console.log("Detect change in state selection ")
+  countyChart();
+});
+
+function fromdatechange() {
+    
+  console.log(" From date selected")
+
+}
+
+
+  

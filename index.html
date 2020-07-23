@@ -45,20 +45,30 @@
   left: 300px;
 }
 
-#form1 {
+#ddmenu {
   position:absolute;
   transition: .5s ease;
   top: 80px;
-  left: 700px;
+  left: 550px;
+}
+
+#state {
+  position:absolute;
+  transition: .5s ease;
+  top: 80px;
+  left: 850px;
 }
 
 #charttitle {  
   position:absolute;
-  text-align: center;
-  background: grey;
-  top: 150px;
-  left: 600px;
+  background: white;
+  left: 350px
+}
 
+#myform {  
+  opacity: 0;
+  position:absolute;
+  left: 850px
 }
 
 </style>
@@ -67,25 +77,28 @@
 <div id="tooltip" opacity=0></div>
 
 <div id="myDivHeader">
-  <h2>Visualization of Covid Cases in United States by STATE and County</h2>
+  <h2>Visualization of Covid Cases in United States</h2>
   <button id="button1" onclick="dailyChart()"> Daily Case Trend </button>
   <button id="button2" onclick="stateChart()"> State Wise Trend </button>
+
+  <label id="ddmenu">Select a State to view its County Trend =></label>
+  <select id="state" name="state" >      
+    <option value="">Select a state</option>
+  </select>  
+  <script src="loadStatesList.js" type="text/javascript">    
+  </script>
   
-
-    <label for="state">Select a State to view its County Trend :</label>
-    <select id="state" name="state" >      
-    </select>  
-    <script src="loadStatesList.js" type="text/javascript">    
-    </script>
-
-
-<button id="button3" onclick="countyChart()"> County Wise Trend </button>
-
 </div>
 
 <div id="myChart">
-  <label id="charttitle"> Click on one of the above trend buttons
+  <label id="charttitle" style="color: red" > Click on one of the above trend buttons or select a state from dropdown
   </label>
+  <form id="myform">
+    <label for="fromdatelbl">From Date</label>
+    <input type="date" id="fromdate" class="date" name="fromdate" onchange="dailyChart()">
+    <label for="todatelbl">To Date</label>
+    <input type="date" id="todate" class="date" name="todate" onchange="dailyChart()">
+  </form>
   <svg width=1400 height=360>
   </svg>
 </div>

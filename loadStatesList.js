@@ -1,5 +1,4 @@
 console.log(" Loading States")
-
 const data = d3.csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
     //const data3 = d3.csv('https://raw.githubusercontent.com/SathishRama/srama.github.io/master/test_counties.csv')        
     .then(function(data3){              
@@ -26,11 +25,7 @@ selectElement.addEventListener('change', (event) => {
   countyChart();
 });
 
-function fromdatechange() {
-    
-  console.log(" From date selected")
 
-}
 
 
   

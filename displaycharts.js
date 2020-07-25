@@ -8,8 +8,8 @@ function dailyChart() {
        var to_dt_sel = document.getElementById('todate').value  
        var formatTime = d3.timeFormat("%Y-%m-%d");
 
-       if (from_dt_sel == '' | document.getElementById('fromdate').value < '2020-03-01' ) {
-                from_dt_sel = formatTime(Date.parse('2020-03-02'))
+       if (from_dt_sel == '' | document.getElementById('fromdate').value < '2020-03-07' ) {
+                from_dt_sel = formatTime(Date.parse('2020-03-08'))
                 document.getElementById('fromdate').value = from_dt_sel                 
               };
         if (to_dt_sel == '') {
@@ -20,6 +20,8 @@ function dailyChart() {
        document.getElementById('charttitle').innerHTML = 'US Daily New Cases Trend'; 
        document.getElementById('charttitle').style.color='blue';
        document.getElementById('myform').style.opacity = 1;
+       document.getElementById('charttrendlabel').style.opacity = 1;
+       document.getElementById('charttrendtext').style.opacity = 1;
        
        d3.select("#myChart").selectAll("svg").remove();
        d3.select("#myChart").append("svg").attr("height",360).attr("width",1400);
@@ -35,18 +37,19 @@ function dailyChart() {
               var dateCounts = d3.nest()
                   .key(function(d) { return Date.parse(d.date)})
                   .rollup(function(v) {return d3.sum(v,function(d) {return d.cases})})
-                  .entries(data2);        
+                  .entries(data2);
+                
+
+              
   
               dateCounts = dateCounts.filter(function(d) {
                 return ( d.key >= Date.parse(from_dt_sel) & d.key <= Date.parse(to_dt_sel)) 
               })
+                            
 
-              var newCases = d3.entries(dateCounts);
-
-              dateCounts.forEach(function(each) {
-                
-                //caseRange[k] = each.value
-                
+              var newCases = d3.entries(dateCounts);                                          
+              dateCounts.forEach(function(each) {                
+                //caseRange[k] = each.value                
                 if (k > 0) {
                     newCases[k-1].value = each.value - dateCounts[k-1].value ;
                     newcaseRange[k-1] = newCases[k-1].value ;
@@ -56,10 +59,16 @@ function dailyChart() {
                 
                 k++;
               });  
-              newCases.forEach(function(each) {
-                console.log( each.key , dateRange[each.key] , each.value )
-              })    
               
+              topday = newCases.filter(function(d) {return ( d.value == d3.max(newcaseRange)) }) ;
+              topdate =  dateRange[topday[0].key]
+              topcount = topday[0].value
+              msg = "Top # of cases "+topcount+"are reported on "+formatTime(topdate) ;
+              
+              document.getElementById('charttrendtext').innerHTML =  msg ; 
+
+              console.log(" Top value : " ,formatTime(dateRange[topday[0].key]), topday[0].value , msg)              
+
               var min_date = formatTime(d3.min(dateRange));
               var max_date = formatTime(d3.max(dateRange));
               
@@ -71,17 +80,48 @@ function dailyChart() {
               xs = d3.scaleBand().domain(dateRange).range([0,1300]);
               ys = d3.scaleLinear().domain([0,d3.max(newcaseRange)]).range([200,0]);
 
+              //==Annotations
+              //const A1date = Date.parse('2020-06-15');
+              const annotations = [
+                {note:  { label: formatTime(topdate),
+                          title: "Top Day of cases"
+                        },
+                      //can use x, y directly instead of data
+                        data: { date: topdate, cases: topcount },
+                        dy: 0,
+                        dx: -50,
+                        subject: { radius: 10, radiusPadding: 10 },
+                        connector: { end: "arrow" }
+                        }
+              ]
+              
+              console.log("...midle of anno..")
+
+              const makeAnnotations = d3.annotation()
+                    .type(d3.annotationCalloutCircle )
+                    .accessors({
+                        x: d => xs(d.date),
+                        y: d => ys(d.cases)
+                      })
+                    .annotations(annotations);
+
+                console.log("...ending anno..")
+              //==Annotations
+
+
               d3.select("#myChart").select("svg").append("g")
                 .attr("transform","translate(50,50)")
+                .attr('class', 'y axis-grid')
                 .call(d3.axisLeft(ys));
               
               d3.select("#myChart").select("svg").append("g")
                 .attr("transform","translate(50,250)")
+                .attr('class', 'x axis-grid')
                 .call(d3.axisBottom(xs)
                        .tickFormat(d3.timeFormat("%m.%d"))
-                     //.ticks(d3.time.months)
-                       .tickSize(3, 0)
-                     //.tickFormat(d3.timeFormat("%m"))
+                       .tickSize(2, 0)
+                      //.tickFormat(d3.timeFormat("%m"))
+                       
                         
                   )
                 .selectAll("text") 
@@ -92,15 +132,19 @@ function dailyChart() {
 
               d3.select("#myChart").select("svg")
                 .append('g').attr("transform","translate(50,50)")
+                .call(makeAnnotations).attr('stroke','red')
                 .append("path")                       
                 .datum(newCases)              
                 .attr("d",d3.line()
                             .x(function(d,i) {return xs(dateRange[d.key])})
                             .y(function(d,i) {return ys(d.value) })
+                            
                     )
                   .attr('fill','none')
                   .attr('stroke-width',2)
-                  .attr('stroke','black');
+                  .attr('stroke','MidnightBlue');
+
+                  
 
         })
         .catch(function() {
@@ -114,6 +158,9 @@ function stateChart() {
         document.getElementById('charttitle').innerHTML = 'US State-wise Total Cases'; 
         document.getElementById('charttitle').style.color='blue';
         document.getElementById('myform').style.opacity = 0;
+        
+        document.getElementById('charttrendlabel').style.opacity = 1;
+        document.getElementById('charttrendtext').style.opacity = 1;        
 
        d3.select("#myChart").selectAll("svg").remove();
        d3.select("#myChart").append("svg").attr("height",360).attr("width",1400);
@@ -135,11 +182,46 @@ function stateChart() {
                 statecases[k] = each.value ;
                 k++ ;
                 //console.log(each.key , each.value);
-              });                          
+              });    
               
-              colorScale = d3.scaleLinear().domain([0,d3.max(statecases)]).range(["grey","pink"]);             
+              colorScale = d3.scaleLinear().domain([0,d3.max(statecases)]).range(["green","red"]);             
               xs = d3.scaleBand().domain(statelist).range([0,1300]);
-              ys = d3.scaleLinear().domain([0,d3.max(statecases)]).range([200,0]);
+              ys = d3.scaleLinear().domain([0,d3.max(statecases)]).range([200,0]);              
+
+              //==Annotations
+              topstate = statecounts.filter(function(d) {return ( d.value == d3.max(statecases)) }) ;
+              topstatename = topstate[0].key
+              topstatecount = topstate[0].value
+              console.log( "Top State " , topstatename, topstatecount )
+              msg =  topstatename+" is the state with highest # of cases "+topstatecount;
+              document.getElementById('charttrendtext').innerHTML =  msg ;
+
+              //const A1date = Date.parse('2020-06-15');
+              const stateannotations = [
+                {note:  { label: topstatecount,
+                          title: "Top State"
+                        },
+                      //can use x, y directly instead of data
+                        data: { state: topstate[0].key, cases: topstate[0].value },
+                        dy: 10,
+                        dx: 30,
+                        subject: { radius: 10, radiusPadding: 10 },
+                        connector: { end: "arrow" }
+                        }
+              ]
+              
+              console.log("...midle of anno..")
+
+              const makestateAnnotations = d3.annotation()
+                    .type(d3.annotationCalloutCircle )
+                    .accessors({
+                        x: d => xs(d.state),
+                        y: d => ys(d.cases)
+                      })
+                    .annotations(stateannotations);
+
+                console.log("...ending anno..")
+              //==Annotations         
 
               d3.select("#myChart").select("svg").append("g")
                 .attr("transform","translate(50,50)")
@@ -158,6 +240,7 @@ function stateChart() {
 
               d3.select("#myChart").select("svg")
                 .append('g').attr("transform","translate(50,50)")
+                .call(makestateAnnotations).attr('stroke','black')
                 .selectAll('rect')
                 //.append("path")
                 .data(statecounts)
@@ -188,6 +271,7 @@ function stateChart() {
                 .transition().duration(2000)
                 .attr('y',function(d,i) {return ys(d.value)})
                 .attr('height',function(d) {return (200 - ys(d.value))});
+        
 
 
         })
@@ -206,11 +290,15 @@ function countyChart() {
        console.log(" Select State " , selected_state);
        
        document.getElementById('myform').style.opacity = 0;
+       document.getElementById('charttrendlabel').style.opacity = 1;
+       document.getElementById('charttrendtext').style.opacity = 1;       
 
        if (selected_state == '') {
           document.getElementById('charttitle').innerHTML = default_msg ;
           document.getElementById('charttitle').style.color='red';
           //document.getElementById('myform').style.opacity = 0;
+          document.getElementById('charttrendlabel').style.opacity = 0;
+          document.getElementById('charttrendtext').style.opacity = 0;
        }
        else {
           document.getElementById('charttitle').innerHTML = selected_state+" : "+'Total cases  by county';
@@ -243,9 +331,44 @@ function countyChart() {
                   //console.log(each.key , each.value);
                 });    
 
-                colorScale = d3.scaleLinear().domain([0,d3.max(countycases)]).range(["lightblue","orange"]);             
+                colorScale = d3.scaleLinear().domain([0,d3.max(countycases)]).range(["green","red"]);             
                 xs = d3.scaleBand().domain(countylist).range([0,1300]);
                 ys = d3.scaleLinear().domain([0,d3.max(countycases)]).range([200,0]);
+
+                //==Annotations
+                topcounty = countycounts.filter(function(d) {return ( d.value == d3.max(countycases)) }) ;
+                topcountyname = topcounty[0].key
+                topcountycount = topcounty[0].value
+                console.log( "Top County " , topcountyname, topcountycount )
+                msg =  topcountyname+" county is reporting highest # of cases "+topcountycount;
+                document.getElementById('charttrendtext').innerHTML =  msg ;
+
+                //const A1date = Date.parse('2020-06-15');
+                const countyannotations = [
+                  {note:  { label: topcountycount,
+                            title: "Top County"
+                          },
+                        //can use x, y directly instead of data
+                          data: { state: topcounty[0].key, cases: topcounty[0].value },
+                          dy: 10,
+                          dx: 30,
+                          subject: { radius: 10, radiusPadding: 10 },
+                          connector: { end: "arrow" }
+                          }
+                ]
+                
+                console.log("...midle of anno..")
+
+                const makecountyAnnotations = d3.annotation()
+                      .type(d3.annotationCalloutCircle )
+                      .accessors({
+                          x: d => xs(d.state),
+                          y: d => ys(d.cases)
+                        })
+                      .annotations(countyannotations);
+
+                  console.log("...ending anno..")
+              //==Annotations         
 
                 d3.select("#myChart").select("svg").append("g")
                   .attr("transform","translate(50,50)")
@@ -263,6 +386,7 @@ function countyChart() {
 
                 d3.select("#myChart").select("svg")
                   .append('g').attr("transform","translate(50,50)")
+                  .call(makecountyAnnotations).attr('stroke','black')
                   .selectAll('rect')
                   //.append("path")
                   .data(countycounts)

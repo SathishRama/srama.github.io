@@ -22,6 +22,14 @@ function dailyChart() {
        document.getElementById('myform').style.opacity = 1;
        document.getElementById('charttrendlabel').style.opacity = 1;
        document.getElementById('charttrendtext').style.opacity = 1;
+
+       document.getElementById('chartnavlabel').style.opacity = 1;
+       document.getElementById('chartnavtext').style.opacity = 1;
+       document.getElementById('chartnavtext1').style.opacity = 1;
+       document.getElementById('chartnavtext2').style.opacity = 1;
+       document.getElementById('chartnavtext').innerHTML =  " 1.To see trend for a date range, select the From & To dates on top right "; 
+       document.getElementById('chartnavtext1').innerHTML =  " 2.To see State Wise trend chart , select the Statewise Button on the top "; 
+       document.getElementById('chartnavtext2').innerHTML =  " 3.To see County Wise trend chart of a State, select the State from drop down"; 
        
        d3.select("#myChart").selectAll("svg").remove();
        d3.select("#myChart").append("svg").attr("height",360).attr("width",1400);
@@ -170,7 +178,16 @@ function stateChart() {
         document.getElementById('myform').style.opacity = 0;
         
         document.getElementById('charttrendlabel').style.opacity = 1;
-        document.getElementById('charttrendtext').style.opacity = 1;        
+        document.getElementById('charttrendtext').style.opacity = 1;      
+
+       document.getElementById('chartnavlabel').style.opacity = 1;
+       document.getElementById('chartnavtext').style.opacity = 1;
+       document.getElementById('chartnavtext1').style.opacity = 1;
+       document.getElementById('chartnavtext2').style.opacity = 1;
+       document.getElementById('chartnavtext').innerHTML =  " 1.Hover mouse over a state bar to see exact count of cases "; 
+       document.getElementById('chartnavtext1').innerHTML =  " 2.To see County Wise trend chart of a State, select the State from drop down"; 
+       document.getElementById('chartnavtext2').innerHTML =  " 3.To see Daily Trend Chart, select the Daily Trend Button on the top "; 
+        
 
        d3.select("#myChart").selectAll("svg").remove();
        d3.select("#myChart").append("svg").attr("height",360).attr("width",1400);
@@ -298,7 +315,16 @@ function countyChart() {
        
        document.getElementById('myform').style.opacity = 0;
        document.getElementById('charttrendlabel').style.opacity = 1;
-       document.getElementById('charttrendtext').style.opacity = 1;       
+       document.getElementById('charttrendtext').style.opacity = 1;  
+
+       document.getElementById('chartnavlabel').style.opacity = 1;
+       document.getElementById('chartnavtext').style.opacity = 1;
+       document.getElementById('chartnavtext1').style.opacity = 1;
+       document.getElementById('chartnavtext2').style.opacity = 1;
+       document.getElementById('chartnavtext').innerHTML =  " 1.Hover mouse over a bar to see exact count of cases "; 
+       document.getElementById('chartnavtext1').innerHTML =  " 2.To see Daily Trend Chart, select the Daily Trend Button on the top ";      
+       document.getElementById('chartnavtext2').innerHTML =  " 3.To see State Wise trend chart , select the Statewise Button on the top "; 
+       
 
        if (selected_state == '') {
           document.getElementById('charttitle').innerHTML = default_msg ;

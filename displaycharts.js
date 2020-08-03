@@ -81,31 +81,13 @@ function dailyChart() {
               ys = d3.scaleLinear().domain([0,d3.max(newcaseRange)]).range([200,0]);
 
               //==Annotations
+              console.log("...begining anno..")
               //const A1date = Date.parse('2020-06-15');
-              const annotations = [
-                {note:  { label: formatTime(topdate),
-                          title: "Top Day of cases"
-                        },
-                      //can use x, y directly instead of data
-                        data: { date: topdate, cases: topcount },
-                        dy: 0,
-                        dx: -50,
-                        subject: { radius: 10, radiusPadding: 10 },
-                        connector: { end: "arrow" }
-                        }
-              ]
-              
-              console.log("...midle of anno..")
+              // label: formatTime(topdate)
+              //title: "Top Day of cases"
+              // data : date: topdate, cases: topcount
 
-              const makeAnnotations = d3.annotation()
-                    .type(d3.annotationCalloutCircle )
-                    .accessors({
-                        x: d => xs(d.date),
-                        y: d => ys(d.cases)
-                      })
-                    .annotations(annotations);
-
-                console.log("...ending anno..")
+              console.log("...ending anno..")
               //==Annotations
 
 
@@ -119,7 +101,9 @@ function dailyChart() {
                 .attr('class', 'x axis-grid')
                 .call(d3.axisBottom(xs)
                        .tickFormat(d3.timeFormat("%m.%d"))
+                       //.tickFormat(d3.timeFormat("%m"))
                        .tickSize(2, 0)
+                       //.ticks(5)
                       //.tickFormat(d3.timeFormat("%m"))
                        
                         
@@ -132,9 +116,9 @@ function dailyChart() {
 
               d3.select("#myChart").select("svg")
                 .append('g').attr("transform","translate(50,50)")
-                .call(makeAnnotations).attr('stroke','red')
-                .append("path")                       
+                //.call(makeAnnotations).attr('stroke','red')
                 .datum(newCases)              
+                .append("path")                                      
                 .attr("d",d3.line()
                             .x(function(d,i) {return xs(dateRange[d.key])})
                             .y(function(d,i) {return ys(d.value) })
@@ -144,7 +128,39 @@ function dailyChart() {
                   .attr('stroke-width',2)
                   .attr('stroke','MidnightBlue');
 
-                  
+              // Annotations logic
+              topday.forEach ( function(each) {
+                console.log (" topday value : " , formatTime(dateRange[each.key]) , each.value)
+                console.log (" x pos : " , xs(dateRange[each.key]))
+                console.log (" y pos : " , ys(each.value))
+              });
+
+              d3.select("#myChart").select("svg")
+                .append('g').attr("transform","translate(50,50)")
+                //.call(makeAnnotations).attr('stroke','red')                           
+                .selectAll("circle")
+                .data(topday)
+                .enter()
+                .append("circle")           
+                .attr("cx",function(d,i) {return xs(dateRange[d.key])})
+                .attr("cy",function(d,i) {return ys(d.value)})
+                .attr("r",5)
+                .attr("fill","none")
+                .attr("stroke","red");
+                
+              d3.select("#myChart").select("svg")
+                .append('g').attr("transform","translate(50,50)")
+                .selectAll("text")
+                .data(topday)
+                .enter()
+                .append("text")           
+                  .attr('x',function(d,i) {return xs(dateRange[d.key]) - 200 })
+                  .attr('y',function(d,i) {return ys(d.value)})                
+                  .attr("font-size", "1em")
+                  .style("fill", "red")
+                  .text(function(d){ return "Highest cases "+d.value+" in a day"});
+              
+              // Annotations logic END
 
         })
         .catch(function() {
@@ -195,32 +211,9 @@ function stateChart() {
               console.log( "Top State " , topstatename, topstatecount )
               msg =  topstatename+" is the state with highest # of cases "+topstatecount;
               document.getElementById('charttrendtext').innerHTML =  msg ;
-
-              //const A1date = Date.parse('2020-06-15');
-              const stateannotations = [
-                {note:  { label: topstatecount,
-                          title: "Top State"
-                        },
-                      //can use x, y directly instead of data
-                        data: { state: topstate[0].key, cases: topstate[0].value },
-                        dy: 10,
-                        dx: 30,
-                        subject: { radius: 10, radiusPadding: 10 },
-                        connector: { end: "arrow" }
-                        }
-              ]
-              
-              console.log("...midle of anno..")
-
-              const makestateAnnotations = d3.annotation()
-                    .type(d3.annotationCalloutCircle )
-                    .accessors({
-                        x: d => xs(d.state),
-                        y: d => ys(d.cases)
-                      })
-                    .annotations(stateannotations);
-
-                console.log("...ending anno..")
+             
+                            
+              //console.log("...ending anno..")
               //==Annotations         
 
               d3.select("#myChart").select("svg").append("g")
@@ -236,11 +229,9 @@ function stateChart() {
                   .attr("transform", "rotate(-65)");
 
               var tooltip = d3.select("#tooltip")
-              //.attr("transform","translate(50,50)")
-
+              
               d3.select("#myChart").select("svg")
                 .append('g').attr("transform","translate(50,50)")
-                .call(makestateAnnotations).attr('stroke','black')
                 .selectAll('rect')
                 //.append("path")
                 .data(statecounts)
@@ -249,8 +240,6 @@ function stateChart() {
                 .on("mouseover", function(d) {   
                   console.log(d3.event.pageX,d3.event.pageY)
                   tooltip.style("opacity",1)
-                  //.style("left",d3.mouse(this)[0]+"px")
-                  //.style("top",d3.mouse(this)[1]+"px")
                   .style("left",(d3.event.pageX)+"px")
                   .style("top",(d3.event.pageY)+"px")                 
                   .html(d.key+":"+d.value);
@@ -272,6 +261,30 @@ function stateChart() {
                 .attr('y',function(d,i) {return ys(d.value)})
                 .attr('height',function(d) {return (200 - ys(d.value))});
         
+              
+              d3.select("#myChart").select("svg")
+                .append('g').attr("transform","translate(50,50)")                         
+                .selectAll("circle")
+                .data(topstate)
+                .enter()
+                .append("circle")           
+                .attr("cx",function(d,i) {return xs(d.key) + 10})
+                .attr("cy",function(d,i) {return ys(d.value)})
+                .attr("r",5)
+                .attr("fill","black")
+                .attr("stroke","black");
+
+              d3.select("#myChart").select("svg")
+                .append('g').attr("transform","translate(50,50)")
+                .selectAll("text")
+                .data(topstate)
+                .enter()
+                .append("text")           
+                  .attr('x',function(d,i) {return xs(d.key) + 20})
+                  .attr('y',function(d,i) {return ys(d.value) - 10 })                
+                  .attr("font-size", "1em")
+                  .style("fill", "black")
+                  .text(function(d){ return d.key+ " is the state with highest cases : "+d.value});
 
 
         })
@@ -342,32 +355,9 @@ function countyChart() {
                 console.log( "Top County " , topcountyname, topcountycount )
                 msg =  topcountyname+" county is reporting highest # of cases "+topcountycount;
                 document.getElementById('charttrendtext').innerHTML =  msg ;
-
-                //const A1date = Date.parse('2020-06-15');
-                const countyannotations = [
-                  {note:  { label: topcountycount,
-                            title: "Top County"
-                          },
-                        //can use x, y directly instead of data
-                          data: { state: topcounty[0].key, cases: topcounty[0].value },
-                          dy: 10,
-                          dx: 30,
-                          subject: { radius: 10, radiusPadding: 10 },
-                          connector: { end: "arrow" }
-                          }
-                ]
-                
+                               
                 console.log("...midle of anno..")
 
-                const makecountyAnnotations = d3.annotation()
-                      .type(d3.annotationCalloutCircle )
-                      .accessors({
-                          x: d => xs(d.state),
-                          y: d => ys(d.cases)
-                        })
-                      .annotations(countyannotations);
-
-                  console.log("...ending anno..")
               //==Annotations         
 
                 d3.select("#myChart").select("svg").append("g")
@@ -386,7 +376,7 @@ function countyChart() {
 
                 d3.select("#myChart").select("svg")
                   .append('g').attr("transform","translate(50,50)")
-                  .call(makecountyAnnotations).attr('stroke','black')
+                  //.call(makecountyAnnotations).attr('stroke','black')
                   .selectAll('rect')
                   //.append("path")
                   .data(countycounts)
@@ -416,6 +406,30 @@ function countyChart() {
                   .transition().duration(2000)
                   .attr('y',function(d,i) {return ys(d.value)})
                   .attr('height',function(d) {return (200 - ys(d.value))});
+
+              d3.select("#myChart").select("svg")
+                .append('g').attr("transform","translate(50,50)")                         
+                .selectAll("circle")
+                .data(topcounty)
+                .enter()
+                .append("circle")           
+                .attr("cx",function(d,i) {return xs(d.key) + 10})
+                .attr("cy",function(d,i) {return ys(d.value)})
+                .attr("r",5)
+                .attr("fill","black")
+                .attr("stroke","black");
+
+              d3.select("#myChart").select("svg")
+                .append('g').attr("transform","translate(50,50)")
+                .selectAll("text")
+                .data(topcounty)
+                .enter()
+                .append("text")           
+                  .attr('x',function(d,i) {return xs(d.key) + 20})
+                  .attr('y',function(d,i) {return ys(d.value) - 10 })                
+                  .attr("font-size", "1em")
+                  .style("fill", "black")
+                  .text(function(d){ return d.key+" is the county with highest cases : "+d.value});
 
           })
           .catch(function() {

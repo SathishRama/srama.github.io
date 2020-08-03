@@ -81,11 +81,7 @@ function dailyChart() {
               ys = d3.scaleLinear().domain([0,d3.max(newcaseRange)]).range([200,0]);
 
               //==Annotations
-              console.log("...begining anno..")
-              //const A1date = Date.parse('2020-06-15');
-              // label: formatTime(topdate)
-              //title: "Top Day of cases"
-              // data : date: topdate, cases: topcount
+              console.log("...begining anno..")              
 
               console.log("...ending anno..")
               //==Annotations
@@ -115,8 +111,7 @@ function dailyChart() {
                   .attr("transform", "rotate(-65)");
 
               d3.select("#myChart").select("svg")
-                .append('g').attr("transform","translate(50,50)")
-                //.call(makeAnnotations).attr('stroke','red')
+                .append('g').attr("transform","translate(50,50)")         
                 .datum(newCases)              
                 .append("path")                                      
                 .attr("d",d3.line()
@@ -136,8 +131,7 @@ function dailyChart() {
               });
 
               d3.select("#myChart").select("svg")
-                .append('g').attr("transform","translate(50,50)")
-                //.call(makeAnnotations).attr('stroke','red')                           
+                .append('g').attr("transform","translate(50,50)")                         
                 .selectAll("circle")
                 .data(topday)
                 .enter()
@@ -376,7 +370,6 @@ function countyChart() {
 
                 d3.select("#myChart").select("svg")
                   .append('g').attr("transform","translate(50,50)")
-                  //.call(makecountyAnnotations).attr('stroke','black')
                   .selectAll('rect')
                   //.append("path")
                   .data(countycounts)
